@@ -38,7 +38,7 @@ shell prompt for `vagrant@traefik-webinar:~$`
 
 Please note that in this lab environment Nomad, Consul, and Vault are configured in `dev` mode. This mode is useful for developing or testing because it doesn't require any extra configuration, and does not persist any state to disk.
 
-!! Warning: Never run -dev mode in production.
+**Warning**: Never run -dev mode in production.
 
 ## Accessing the environment
 
