@@ -1,5 +1,7 @@
 # Simplifying Infrastructure and Networking Automation with HashiCorp and Traefik
 
+Insert summary blurb here about what this is webinar / blog / demo / etc
+
 ## Getting Started
 
 You can use Vagrant to set up the lab environment used in this webinar. Vagrant is
@@ -151,6 +153,7 @@ At this point, you have removed all of the parts that are added by starting up
 the Vagrantfile.
 
 ## Documentation and References
+- [Traefik](https://doc.traefik.io/traefik/)
 - [Introduction to Consul](https://learn.hashicorp.com/tutorials/consul/get-started?in=consul/getting-started)
 - [Introduction to Vault](https://learn.hashicorp.com/tutorials/vault/getting-started-intro?in=vault/getting-started)
 - [Introduction to Nomad](https://learn.hashicorp.com/tutorials/nomad/get-started-intro?in=nomad/get-started)
