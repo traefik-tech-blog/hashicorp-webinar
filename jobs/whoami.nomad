@@ -34,6 +34,11 @@ job "whoami" {
         ports = ["web"]
         args  = ["--port", "${NOMAD_PORT_web}"]
       }
+
+      resources {
+        cpu    = 100
+        memory = 128
+      }
     }
   }
 }
