@@ -1,6 +1,12 @@
 job "traefik" {
   datacenters = ["dc1"]
 
+  affinity {
+    attribute = "${node.unique.name}"
+    value     = "traefik-webinar-1"
+    weight    = 100
+  }
+
   group "traefik" {
     count = 1
 
@@ -35,10 +41,10 @@ job "traefik" {
       name = "traefik-dashboard"
       port = "api"
 
-#      tags = [
-#        "traefik.enable=true",
-#        "traefik.http.routers.dashboard.rule=Path(`/dashboard`)",
-#      ]
+      #      tags = [
+      #        "traefik.enable=true",
+      #        "traefik.http.routers.dashboard.rule=Path(`/dashboard`)",
+      #      ]
 
       check {
         type     = "http"
@@ -89,6 +95,11 @@ providers:
 EOF
 
         destination = "local/traefik.yaml"
+      }
+
+      resources {
+        cpu    = 100
+        memory = 128
       }
     }
   }

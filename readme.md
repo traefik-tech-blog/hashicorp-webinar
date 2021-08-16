@@ -11,20 +11,21 @@ a tool for building and managing virtual machine environments.
 these [instructions](https://www.vagrantup.com/docs/installation/). You also
 need a virtualization tool, such as [VirtualBox](https://www.virtualbox.org/).
 
-From a terminal in this folder, you may create the virtual machine with the `vagrant up` command.
+From a terminal in this folder, you may create the virtual machines with the `vagrant up` command.
 
 ```shell-session
 $ vagrant up
 ```
 
 This takes a few minutes as the base Ubuntu box must be downloaded
-and provisioned with Docker, Nomad, and Consul. Once this completes, you should see this output.
+and provisioned with Docker, Nomad, Consul, and Vault. Once this completes, you should see this output.
 
 ```plaintext hideClipboard
-Bringing machine 'default' up with 'virtualbox' provider...
-==> default: Importing base box 'bento/ubuntu-18.04'...
+Bringing machine 'primary' up with 'virtualbox' provider...
+Bringing machine 'secondary' up with 'virtualbox' provider...
+==> primary: Importing base box 'hashicorp/bionic64'...
 ...
-==> default: Running provisioner: docker...
+==> primary: Running provisioner: shell...
 ```
 
 Once this provisioning completes, use the `vagrant ssh` command to start a shell session on it.
@@ -34,7 +35,7 @@ $ vagrant ssh
 ```
 
 If you connect to the virtual machine properly, you should find yourself at a
-shell prompt for `vagrant@traefik-webinar:~$`
+shell prompt for `vagrant@traefik-webinar-1:~$`
 
 Please note that in this lab environment Nomad, Consul, and Vault are configured in `dev` mode. This mode is useful for developing or testing because it doesn't require any extra configuration, and does not persist any state to disk.
 
@@ -42,13 +43,16 @@ Please note that in this lab environment Nomad, Consul, and Vault are configured
 
 ## Accessing the environment
 
-You may view the Nomad and Consul interfaces with a web browser. Please access here:
+You may view the Nomad, Consul, and Vault interfaces with a web browser. Please access here:
 - Nomad UI http://localhost:4646/
 - Consul UI http://localhost:8500/
+- Vault UI http://localhost:8200/
 
 ## Demo
 
 ### Nomad
+
+Will be shown together with Consul below.
 
 ### Consul
 
@@ -68,6 +72,12 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 #### Consul Connect
 
 ```bash
+nomad job run jobs/countdash.nomad
+```
+
+Visit http://localhost:9002/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
+
+```bash
 nomad job run jobs/whoami-connect.nomad
 
 nomad status
@@ -84,6 +94,7 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 ```bash
 # Enable Vault PKI and create role
 export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
 
 vault secrets enable pki
 
