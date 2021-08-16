@@ -114,35 +114,39 @@ vault kv put secret/traefik.localhost cert="$(cat cert.pem | base64 -w0)" key="$
 
 ## Cleaning up
 
-### Halt the VM
+### Halt the VMs
 
 Exit any shell sessions that you made to the virtual machine. Use the `vagrant halt` command to stop the
-running VM.
+running VMs.
 
 ```shell-session
 $ vagrant halt
 ```
 
-At this point, you can start the VM again without having to provision it.
+At this point, you can start the VMs again without having to provision it.
 
-### De-provision the VM
+### De-provision the VMs
 
-If you don't anticipate using the training VM for a while, and don't mind the
-time necessary to provision it, you can deprovision the VM. From this folder, use the `vagrant destroy` command to
-deprovision the environment your created. The command verifies that you intend
-to perform this activity; enter `Y` to confirm that you do.
+If you don't anticipate using the training VMs for a while, and don't mind the
+time necessary to provision them, you can deprovision the VMs. From this folder,
+use the `vagrant destroy` command to deprovision the environment your created.
+The command verifies that you intend to perform this activity; enter `Y` at both
+prompts to confirm that you do.
 
 ```shell-session
 $ vagrant destroy
 ```
 
 ```plaintext
-    default: Are you sure you want to destroy the 'default' VM? [y/N] y
-==> default: Forcing shutdown of VM...
-==> default: Destroying VM and associated drives...
+    secondary: Are you sure you want to destroy the 'secondary' VM? [y/N] y
+==> secondary: Forcing shutdown of VM...
+==> secondary: Destroying VM and associated drives...
+    primary: Are you sure you want to destroy the 'primary' VM? [y/N] y
+==> primary: Forcing shutdown of VM...
+==> primary: Destroying VM and associated drives...
 ```
 
-De-provisioning the environment deletes the VM that is created based on the base
+De-provisioning the environment deletes the VMs that were created based on the base
 box.
 
 ### Remove the base box
@@ -153,11 +157,11 @@ delete the downloaded Vagrant base box used to create the VM by running the
 again later, Vagrant re-downloads the base box when you need it.
 
 ```shell-session
-$ vagrant box remove bento/ubuntu-18.04
+$ vagrant box remove hashicorp/bionic64
 ```
 
 ```plaintext
-Removing box 'bento/ubuntu-18.04' (v202008.16.0) with provider 'virtualbox'...
+Removing box 'hashicorp/bionic64' (v1.0.282) with provider 'virtualbox'...
 ```
 
 At this point, you have removed all of the parts that are added by starting up
