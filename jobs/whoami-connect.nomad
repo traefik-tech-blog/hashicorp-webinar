@@ -5,6 +5,8 @@ job "whoami" {
     count = 2
 
     network {
+      mode = "bridge"
+
       port "web" {}
     }
 
@@ -12,8 +14,13 @@ job "whoami" {
       name = "whoami"
       port = "web"
 
+      connect {
+        sidecar_service {}
+      }
+
       tags = [
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.whoami.rule=Path(`/whoami`)",
       ]
 
@@ -33,6 +40,11 @@ job "whoami" {
         image = "traefik/whoami"
         ports = ["web"]
         args  = ["--port", "${NOMAD_PORT_web}"]
+      }
+
+      resources {
+        cpu    = 100
+        memory = 128
       }
     }
   }
