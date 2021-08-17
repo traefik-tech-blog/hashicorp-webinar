@@ -77,28 +77,85 @@ curl localhost/whoami
 
 Visit http://localhost:8080/whoami from your desktop. Take note of the value `RemoteAddr`. What is it now? What was it before? What's changed and why?
 
-### Vault
+### Set up TraefikEE
 
-#### PKI
+You'll need to download `teectl` using the appropriate download link at https://doc.traefik.io/traefik-enterprise/installing/teectl-cli/.
 
 ```bash
-# Enable Vault PKI and create role
+# create bundle.zip file
+teectl setup --onpremise.hosts="127.0.0.1" --cluster nomad --force
+
+# vagrant reload --provision
+
+vagrant ssh
+# in VM
+
+# move bundle.zip to controller data volume
+sudo mv ./bundle.zip /opt/traefikee/
+
+# create vault secrets for traefikee license and plugin registry token
 export VAULT_ADDR=http://127.0.0.1:8200
 
+vault kv put secret/traefikee/license license_key=$TRAEFIKEE_LICENSE
+
+export PLUGIN_TOKEN=$(openssl rand -base64 10)
+vault kv put secret/traefikee/plugin token=$PLUGIN_TOKEN
+
+# run traefikee nomad job
+nomad job run jobs/traefikee.nomad
+
+# get controller alloc ID
+nomad status traefikee
+
+# update with actual ALLOC_ID value
+export CONTROLLER_ALLOC_ID=$ALLOC_ID
+
+# get proxy join token
+nomad alloc exec -i -t -task controllers $CONTROLLER_ALLOC_ID /traefikee tokens --socket local/cluster.sock
+# export provided TRAEFIKEE_PROXY_TOKEN 
+
+# add proxy token to vault
+vault kv put secret/traefikee/proxy token=$TRAEFIKEE_PROXY_TOKEN
+
+# verify all nodes are running (outside of VM)
+teectl get nodes
+```
+
+
+### Vault PKI
+
+```bash
+# Enable Vault PKI and create role (inside VM)
 vault secrets enable pki
 
 vault write pki/root/generate/internal common_name="VAULT PKI CERT"
 vault write pki/roles/traefikee allowed_domains=localhost allow_bare_domains=true allow_subdomains=true max_ttl=10h
+
+# apply static and dynamic config (outside of VM)
+teectl apply --file traefikee/static.yaml
+teectl apply --file traefikee/dynamic.yaml
+
+# update whoami job (inside of VM)
+nomad run jobs/whoami-tls.nomad
+
+# curl and note TLS certificate
+curl -kv https://localhost:443/whoami
 ```
 
-#### KV Store
+### Vault TLS KV Store
 
 ```bash
 # generate self-signed certificate
-# TODO
+openssl req -x509 -newkey rsa:2048 -keyout localhost.key.pem -out localhost.cert.pem -nodes -subj '/CN=localhost'
 
 # Add TLS cert to Vault KV store
-vault kv put secret/traefik.localhost cert="$(cat cert.pem | base64 -w0)" key="$(cat key.pem | base64 -w0)"
+vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key="$(cat localhost.key.pem | base64 -w0)"
+
+# update whoami job
+nomad run jobs/whoami-tls.nomad
+
+# curl and note TLS certificate
+curl -kv https://localhost:443/whoami
 ```
 
 ## Cleaning up

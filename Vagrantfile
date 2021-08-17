@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 80, host: 8080, auto_correct: true, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 443, host: 8443, auto_correct: true, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 9002, host: 9002, auto_correct: true, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 55055, host: 55055, auto_correct: true, host_ip: "127.0.0.1"
 
   config.vm.provision "shell", inline: <<-SHELL
     # add HashiCorp GPG key and repo
@@ -47,7 +48,7 @@ Vagrant.configure("2") do |config|
     apt-get install nomad=1.1.3 -y
 
     # set nomad to dev mode
-    sudo sed -i 's|ExecStart.*|ExecStart=/usr/bin/nomad agent -dev-connect|' /usr/lib/systemd/system/nomad.service
+    sudo sed -i 's|ExecStart.*|ExecStart=/usr/bin/nomad agent -dev-connect -config /home/vagrant/config/nomad.hcl|' /usr/lib/systemd/system/nomad.service
 
     # start nomad
     sudo systemctl enable nomad
@@ -68,9 +69,14 @@ Vagrant.configure("2") do |config|
 
     # install vault
     apt-get install vault=1.8.1 -y
+
+    # create traefikee directories
+    sudo mkdir -p /opt/traefikee /opt/traefikee-plugins
   SHELL
 
   # Copy Nomad job files to host
   config.vm.provision "file", source: "jobs", destination: "jobs"
+  config.vm.provision "file", source: "config", destination: "config"
+  config.vm.provision "file", source: "bundle.zip", destination: "bundle.zip"
 
 end
