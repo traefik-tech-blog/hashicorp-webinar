@@ -11,20 +11,21 @@ a tool for building and managing virtual machine environments.
 these [instructions](https://www.vagrantup.com/docs/installation/). You also
 need a virtualization tool, such as [VirtualBox](https://www.virtualbox.org/).
 
-From a terminal in this folder, you may create the virtual machine with the `vagrant up` command.
+From a terminal in this folder, you may create the virtual machines with the `vagrant up` command.
 
 ```shell-session
 $ vagrant up
 ```
 
 This takes a few minutes as the base Ubuntu box must be downloaded
-and provisioned with Docker, Nomad, and Consul. Once this completes, you should see this output.
+and provisioned with Docker, Nomad, Consul, and Vault. Once this completes, you should see this output.
 
 ```plaintext hideClipboard
-Bringing machine 'default' up with 'virtualbox' provider...
-==> default: Importing base box 'bento/ubuntu-18.04'...
+Bringing machine 'primary' up with 'virtualbox' provider...
+Bringing machine 'secondary' up with 'virtualbox' provider...
+==> primary: Importing base box 'hashicorp/bionic64'...
 ...
-==> default: Running provisioner: docker...
+==> primary: Running provisioner: shell...
 ```
 
 Once this provisioning completes, use the `vagrant ssh` command to start a shell session on it.
@@ -34,7 +35,7 @@ $ vagrant ssh
 ```
 
 If you connect to the virtual machine properly, you should find yourself at a
-shell prompt for `vagrant@traefik-webinar:~$`
+shell prompt for `vagrant@traefik-webinar-1:~$`
 
 Please note that in this lab environment Nomad, Consul, and Vault are configured in `dev` mode. This mode is useful for developing or testing because it doesn't require any extra configuration, and does not persist any state to disk.
 
@@ -42,13 +43,16 @@ Please note that in this lab environment Nomad, Consul, and Vault are configured
 
 ## Accessing the environment
 
-You may view the Nomad and Consul interfaces with a web browser. Please access here:
+You may view the Nomad, Consul, and Vault interfaces with a web browser. Please access here:
 - Nomad UI http://localhost:4646/
 - Consul UI http://localhost:8500/
+- Vault UI http://localhost:8200/
 
 ## Demo
 
 ### Nomad
+
+Will be shown together with Consul below.
 
 ### Consul
 
@@ -66,6 +70,12 @@ curl localhost/whoami
 Visit http://localhost:8080/whoami from your desktop. Take note of the value `RemoteAddr`.
 
 #### Consul Connect
+
+```bash
+nomad job run jobs/countdash.nomad
+```
+
+Visit http://localhost:9002/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
 
 ```bash
 nomad job run jobs/whoami-connect.nomad
@@ -95,6 +105,7 @@ sudo mv ./bundle.zip /opt/traefikee/
 
 # create vault secrets for traefikee license and plugin registry token
 export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
 
 vault kv put secret/traefikee/license license_key=$TRAEFIKEE_LICENSE
 
@@ -160,35 +171,39 @@ curl -kv https://localhost:443/whoami
 
 ## Cleaning up
 
-### Halt the VM
+### Halt the VMs
 
 Exit any shell sessions that you made to the virtual machine. Use the `vagrant halt` command to stop the
-running VM.
+running VMs.
 
 ```shell-session
 $ vagrant halt
 ```
 
-At this point, you can start the VM again without having to provision it.
+At this point, you can start the VMs again without having to provision it.
 
-### De-provision the VM
+### De-provision the VMs
 
-If you don't anticipate using the training VM for a while, and don't mind the
-time necessary to provision it, you can deprovision the VM. From this folder, use the `vagrant destroy` command to
-deprovision the environment your created. The command verifies that you intend
-to perform this activity; enter `Y` to confirm that you do.
+If you don't anticipate using the training VMs for a while, and don't mind the
+time necessary to provision them, you can deprovision the VMs. From this folder,
+use the `vagrant destroy` command to deprovision the environment your created.
+The command verifies that you intend to perform this activity; enter `Y` at both
+prompts to confirm that you do.
 
 ```shell-session
 $ vagrant destroy
 ```
 
 ```plaintext
-    default: Are you sure you want to destroy the 'default' VM? [y/N] y
-==> default: Forcing shutdown of VM...
-==> default: Destroying VM and associated drives...
+    secondary: Are you sure you want to destroy the 'secondary' VM? [y/N] y
+==> secondary: Forcing shutdown of VM...
+==> secondary: Destroying VM and associated drives...
+    primary: Are you sure you want to destroy the 'primary' VM? [y/N] y
+==> primary: Forcing shutdown of VM...
+==> primary: Destroying VM and associated drives...
 ```
 
-De-provisioning the environment deletes the VM that is created based on the base
+De-provisioning the environment deletes the VMs that were created based on the base
 box.
 
 ### Remove the base box
@@ -199,11 +214,11 @@ delete the downloaded Vagrant base box used to create the VM by running the
 again later, Vagrant re-downloads the base box when you need it.
 
 ```shell-session
-$ vagrant box remove bento/ubuntu-18.04
+$ vagrant box remove hashicorp/bionic64
 ```
 
 ```plaintext
-Removing box 'bento/ubuntu-18.04' (v202008.16.0) with provider 'virtualbox'...
+Removing box 'hashicorp/bionic64' (v1.0.282) with provider 'virtualbox'...
 ```
 
 At this point, you have removed all of the parts that are added by starting up
