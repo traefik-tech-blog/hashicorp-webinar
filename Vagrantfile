@@ -79,11 +79,27 @@ advertise {
 client {
   enabled           = true
   network_interface = "eth1"
+
+  host_volume "traefikee-data" {
+    path = "/opt/traefikee"
+    read_only = false
+  }
+
+  host_volume "traefikee-plugins" {
+    path = "/opt/traefikee-plugins"
+    read_only = false
+  }
 }
 server {
   enabled          = true
   bootstrap_expect = 2
 }
+vault {
+  enabled = true
+  address = "http://192.168.88.4:8200"
+  token   = "root"
+}
+
 EOF
 
 mv /tmp/nomad-config /etc/nomad.d/nomad.hcl
@@ -125,7 +141,7 @@ Vagrant.configure("2") do |config|
 
     # Increase memory for Virtualbox
     primary.vm.provider "virtualbox" do |vb|
-      vb.memory = "1536"
+      vb.memory = "2048"
     end
 
     # set up Vault

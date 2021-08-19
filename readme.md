@@ -92,8 +92,12 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 You'll need to download `teectl` using the appropriate download link at https://doc.traefik.io/traefik-enterprise/installing/teectl-cli/.
 
 ```bash
+# stop previous jobs
+nomad stop traefik
+nomad stop countdash
+
 # create bundle.zip file
-teectl setup --onpremise.hosts="127.0.0.1" --cluster nomad --force
+teectl setup --onpremise.hosts="192.168.88.4,192.168.88.5" --cluster nomad --force
 
 # vagrant reload --provision
 

@@ -4,6 +4,12 @@ job "traefikee" {
   group "controllers" {
     count = 1
 
+    affinity {
+      attribute = "${node.unique.name}"
+      value     = "traefik-webinar-1"
+      weight    = 100
+    }
+
     network {
       mode = "host"
 
@@ -49,7 +55,7 @@ job "traefikee" {
           "--socket=${NOMAD_TASK_DIR}/cluster.sock",
           "--api.socket=${NOMAD_TASK_DIR}/api.sock",
           "--plugin.token=${PLUGIN_TOKEN}",
-          "--plugin.url=https://${NOMAD_ADDR_plugin-registry_https}",
+          "--plugin.url=https://192.168.88.5:8443",
         ]
         cap_add = ["NET_BIND_SERVICE"]
 
@@ -87,7 +93,7 @@ EOF
   }
 
   group "proxies" {
-    count = 1
+    count = 2
     
     network {
       mode = "host"
@@ -121,7 +127,7 @@ EOF
 
         args = [
           "proxy",
-          "--discovery.static.peers=${NOMAD_ADDR_controllers_control}",
+          "--discovery.static.peers=192.168.88.4:4242",
           "--jointoken.value=${PROXY_JOIN_TOKEN}",
         ]
 
@@ -158,6 +164,12 @@ EOF
 
   group "plugin-registry" {
     count = 1
+
+    affinity {
+      attribute = "${node.unique.name}"
+      value     = "traefik-webinar-2"
+      weight    = 100
+    }
     
     network {
       mode = "host"
@@ -185,7 +197,7 @@ EOF
         args = [
           "plugin-registry",
           "--addr=:8443",
-          "--discovery.static.peers=${NOMAD_ADDR_controllers_control}",
+          "--discovery.static.peers=192.168.88.4:4242",
           "--jointoken.value=${PROXY_JOIN_TOKEN}",
           "--plugindir=/data/plugins/",
           "--token=${PLUGIN_TOKEN}",
