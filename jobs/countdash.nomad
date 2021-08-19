@@ -2,6 +2,12 @@ job "countdash" {
   datacenters = ["dc1"]
 
   group "api" {
+    affinity {
+      attribute = "${node.unique.name}"
+      value     = "traefik-webinar-2"
+      weight    = 100
+    }
+
     network {
       mode = "bridge"
     }
@@ -25,6 +31,12 @@ job "countdash" {
   }
 
   group "dashboard" {
+    affinity {
+      attribute = "${node.unique.name}"
+      value     = "traefik-webinar-1"
+      weight    = 100
+    }
+
     network {
       mode = "bridge"
 
