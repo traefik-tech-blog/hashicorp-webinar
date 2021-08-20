@@ -15,8 +15,8 @@ job "whoami" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.whoami.entrypoints=websecure",
-        "traefik.http.routers.whoami.rule=Host(`localhost`) && Path(`/whoami-tls`)",
-        "traefik.http.routers.whoami.tls=true",
+        "traefik.http.routers.whoami.rule=Host(`localhost`) && Path(`/whoami-pki`)",
+        "traefik.http.routers.whoami.tls.certresolver=vault-pki",
       ]
 
       check {

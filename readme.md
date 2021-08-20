@@ -56,7 +56,7 @@ You may view the Nomad, Consul, and Vault interfaces with a web browser. Please 
 - Consul UI http://localhost:8500/
 - Vault UI http://localhost:8200/
 
-Note: If any of these do not work, please check your Vagrant output. If there is a port collision on your system Vagrant may assign a different port.
+*Note*: If any of these do not work, please check your Vagrant output. If there is a port collision on your system Vagrant may assign a different port.
 
 ## Demo
 
@@ -85,7 +85,9 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 nomad run jobs/countdash.nomad
 ```
 
-Visit http://localhost:9002/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
+Visit http://countdash.localhost:8080/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
+
+*Note*: you'll need to add `countdash.localhost` to the `127.0.0.1` entry in your `/etc/hosts` file in order to properly resolve the app from your browser.
 
 ```bash
 nomad run jobs/whoami-connect.nomad
@@ -99,7 +101,7 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 
 ### Set up TraefikEE
 
-NOTE: These steps require a Traefik Enterprise license. If you don't have a license, you may request a free 30-day trial [here](https://info.traefik.io/get-traefik-enterprise-free-for-30-days).
+*Note*: These steps require a Traefik Enterprise license. If you don't have a license, you may request a free 30-day trial [here](https://info.traefik.io/get-traefik-enterprise-free-for-30-days).
 
 These steps begin from your desktop machine, not the vagrant host.
 
@@ -173,10 +175,10 @@ teectl apply --file traefikee/static.yaml
 teectl apply --file traefikee/dynamic.yaml
 
 # update whoami job (inside of VM)
-nomad run jobs/whoami-tls.nomad
+nomad run jobs/whoami-pki.nomad
 
 # curl and note TLS certificate
-curl -kv https://localhost:443/whoami
+curl -kv https://localhost/whoami-pki
 ```
 
 ### Vault TLS KV Store
@@ -192,7 +194,7 @@ vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key=
 nomad run jobs/whoami-tls.nomad
 
 # curl and note TLS certificate
-curl -kv https://localhost:443/whoami
+curl -kv https://localhost/whoami-tls
 ```
 
 ## Cleaning up

@@ -17,14 +17,14 @@ providers:
 
   plugin:
     vault:
-      url: "http://127.0.0.1:8200"
+      url: "http://192.168.88.4:8200"
       auth:
         token: "root"
 
 certificatesResolvers:
-  vault:
+  vault-pki:
     vault:
-      url: "http://127.0.0.1:8200"
+      url: "http://192.168.88.4:8200"
       role: "traefikee"
       auth:
         token: "root"
