@@ -87,7 +87,7 @@ nomad run jobs/countdash.nomad
 
 Visit http://countdash.localhost:8080/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
 
-*Note*: you'll need to add `countdash.localhost` to the `127.0.0.1` entry in your `/etc/hosts` file in order to properly resolve the app from your browser.
+*Note*: You'll need to add `countdash.localhost` to the `127.0.0.1` entry in your `/etc/hosts` file in order to properly resolve the app from your browser.
 
 ```bash
 nomad run jobs/whoami-connect.nomad
@@ -98,6 +98,8 @@ curl localhost/whoami
 ```
 
 Visit http://localhost:8080/whoami from your desktop. Take note of the value `RemoteAddr`. What is it now? What was it before? What's changed and why?
+
+*Note*: Traefik Connect integration requires the parameter `connectAware` be set to `true` in the consulCatalog provider section of your Traefik configuration.
 
 ### Set up TraefikEE
 

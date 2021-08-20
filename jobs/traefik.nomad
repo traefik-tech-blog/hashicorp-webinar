@@ -1,15 +1,8 @@
 job "traefik" {
   datacenters = ["dc1"]
-
-  affinity {
-    attribute = "${node.unique.name}"
-    value     = "traefik-webinar-1"
-    weight    = 100
-  }
+  type        = "system"
 
   group "traefik" {
-    count = 1
-
     network {
       port "web" {
         static = 80

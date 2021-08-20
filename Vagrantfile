@@ -68,7 +68,9 @@ apt-get install vault=1.8.1 -y
 sudo mkdir -p /opt/traefikee /opt/traefikee-plugins
 
 # configuring environment
-nomad -autocomplete-install
+sudo -H -u vagrant nomad -autocomplete-install
+sudo -H -u vagrant consul -autocomplete-install
+sudo -H -u vagrant vault -autocomplete-install
 sudo tee -a /etc/environment <<EOF
 export VAULT_ADDR=http://192.168.88.4:8200
 export VAULT_TOKEN=root
