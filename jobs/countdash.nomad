@@ -27,6 +27,11 @@ job "countdash" {
       config {
         image = "hashicorpnomad/counter-api:v3"
       }
+
+      resources {
+        cpu    = 100
+        memory = 128
+      }
     }
   }
 
@@ -77,6 +82,11 @@ job "countdash" {
 
       config {
         image = "hashicorpnomad/counter-dashboard:v3"
+      }
+
+      resources {
+        cpu    = 100
+        memory = 128
       }
     }
   }

@@ -18,10 +18,6 @@ job "traefik" {
       port "websecure" {
         static = 443
       }
-
-      port "api" {
-        static = 8081
-      }
     }
 
     service {
@@ -32,24 +28,6 @@ job "traefik" {
         type     = "http"
         path     = "/ping"
         port     = "web"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-
-    service {
-      name = "traefik-dashboard"
-      port = "api"
-
-      #      tags = [
-      #        "traefik.enable=true",
-      #        "traefik.http.routers.dashboard.rule=Path(`/dashboard`)",
-      #      ]
-
-      check {
-        type     = "http"
-        path     = "/"
-        port     = "api"
         interval = "10s"
         timeout  = "2s"
       }
@@ -74,12 +52,6 @@ entryPoints:
     address: ":80"
   websecure:
     address: ":443"
-  traefik:
-    address: ":8081"
-
-api:
-  dashboard: true
-  insecure: true
 
 ping:
   entryPoint: "web"

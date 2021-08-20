@@ -43,6 +43,7 @@ job "traefikee" {
 
       config {
         image = "traefik/traefikee:latest"
+
         args = [
           "controller",
           "--name=${NOMAD_ALLOC_NAME}",
@@ -57,6 +58,7 @@ job "traefikee" {
           "--plugin.token=${PLUGIN_TOKEN}",
           "--plugin.url=https://192.168.88.5:8443",
         ]
+
         cap_add = ["NET_BIND_SERVICE"]
 
         cap_drop = ["ALL"]
@@ -72,10 +74,11 @@ job "traefikee" {
       }
 
       template {
-        data        = <<EOF
+        data = <<EOF
 TRAEFIKEE_LICENSE="{{with secret "secret/traefikee/license"}}{{.Data.data.license_key}}{{end}}"
 PLUGIN_TOKEN="{{with secret "secret/traefikee/plugin"}}{{.Data.data.token}}{{end}}"
 EOF
+
         destination = "secrets/traefikee.env"
         env         = true
       }
@@ -94,10 +97,10 @@ EOF
 
   group "proxies" {
     count = 2
-    
+
     network {
       mode = "host"
-      
+
       port "distributed" {
         static = 8484
       }
@@ -109,13 +112,13 @@ EOF
       port "websecure" {
         static = 443
       }
-    } 
+    }
 
     service {
       name = "traefikee-proxies"
-      
+
       port = "web"
-      
+
       task = "proxies"
     }
 
@@ -138,9 +141,9 @@ EOF
         dns_servers = [
           "127.0.0.1",
           "${attr.unique.network.ip-address}",
-          "8.8.8.8"
+          "8.8.8.8",
         ]
-        
+
         network_mode = "host"
 
         ports = ["distributed", "web", "websecure"]
@@ -152,7 +155,7 @@ EOF
       }
 
       template {
-        data        = <<EOF
+        data = <<EOF
 PROXY_JOIN_TOKEN="{{with secret "secret/traefikee/proxy"}}{{.Data.data.token}}{{end}}"
 EOF
 
@@ -170,21 +173,20 @@ EOF
       value     = "traefik-webinar-2"
       weight    = 100
     }
-    
+
     network {
       mode = "host"
-      
+
       port "https" {
         static = 8443
       }
-
-    } 
+    }
 
     service {
       name = "traefikee-plugin-registry"
-      
+
       port = "https"
-      
+
       task = "plugin-registry"
     }
 
@@ -210,9 +212,9 @@ EOF
         dns_servers = [
           "127.0.0.1",
           "${attr.unique.network.ip-address}",
-          "8.8.8.8"
+          "8.8.8.8",
         ]
-        
+
         network_mode = "host"
 
         ports = ["https"]
@@ -224,10 +226,11 @@ EOF
       }
 
       template {
-        data        = <<EOF
+        data = <<EOF
 PROXY_JOIN_TOKEN="{{with secret "secret/traefikee/proxy"}}{{.Data.data.token}}{{end}}"
 PLUGIN_TOKEN="{{with secret "secret/traefikee/plugin"}}{{.Data.data.token}}{{end}}"
 EOF
+
         destination = "secrets/traefikee.env"
         env         = true
       }

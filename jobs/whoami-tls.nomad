@@ -16,6 +16,7 @@ job "whoami" {
         "traefik.enable=true",
         "traefik.http.routers.whoami.entrypoints=websecure",
         "traefik.http.routers.whoami.rule=Host(`localhost`) && Path(`/whoami`)",
+
         # uncomment for Vault TLS provider
         # "traefik.http.routers.whoami.tls=true",
         # uncomment for Vault PKI certificate resolver
