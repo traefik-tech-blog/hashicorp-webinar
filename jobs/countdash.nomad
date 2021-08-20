@@ -41,7 +41,6 @@ job "countdash" {
       mode = "bridge"
 
       port "http" {
-        static = 9002
         to     = 9002
       }
     }
@@ -53,7 +52,7 @@ job "countdash" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.countdash.rule=Path(`/`)",
+        "traefik.http.routers.countdash.rule=Host(`countdash.localhost`)",
       ]
 
       connect {

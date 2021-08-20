@@ -75,7 +75,9 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 nomad job run jobs/countdash.nomad
 ```
 
-Visit http://localhost:9002/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
+Visit http://countdash.localhost:8080/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
+
+*Note*: you'll need to add `countdash.localhost` to the `127.0.0.1` entry in your `/etc/hosts` file in order to properly resolve the app from your browser.
 
 ```bash
 nomad job run jobs/whoami-connect.nomad
@@ -95,6 +97,7 @@ You'll need to download `teectl` using the appropriate download link at https://
 # stop previous jobs
 nomad stop traefik
 nomad stop countdash
+nomad stop whoami
 
 # create bundle.zip file
 teectl setup --onpremise.hosts="192.168.88.4,192.168.88.5" --cluster nomad --force
@@ -151,10 +154,10 @@ teectl apply --file traefikee/static.yaml
 teectl apply --file traefikee/dynamic.yaml
 
 # update whoami job (inside of VM)
-nomad run jobs/whoami-tls.nomad
+nomad run jobs/whoami-pki.nomad
 
 # curl and note TLS certificate
-curl -kv https://localhost:443/whoami
+curl -kv https://localhost/whoami-pki
 ```
 
 ### Vault TLS KV Store
@@ -170,7 +173,7 @@ vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key=
 nomad run jobs/whoami-tls.nomad
 
 # curl and note TLS certificate
-curl -kv https://localhost:443/whoami
+curl -kv https://localhost/whoami-tls
 ```
 
 ## Cleaning up
