@@ -1,0 +1,30 @@
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+api:
+  dashboard: true
+
+providers:
+  consulCatalog:
+    prefix: "traefik"
+    exposedByDefault: false
+    endpoint:
+      address: "127.0.0.1:8500"
+      scheme: "http"
+
+  plugin:
+    vault:
+      url: "http://192.168.88.4:8200"
+      auth:
+        token: "root"
+
+certificatesResolvers:
+  vault-pki:
+    vault:
+      url: "http://192.168.88.4:8200"
+      role: "traefikee"
+      auth:
+        token: "root"
