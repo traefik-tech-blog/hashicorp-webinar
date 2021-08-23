@@ -138,6 +138,7 @@ nomad stop whoami
 
 # move bundle.zip to controller data volume
 sudo mv ./bundle.zip /opt/traefikee/
+sudo chown root:root /opt/traefikee/bundle.zip
 
 # create vault secrets for traefikee license and plugin registry token (assuming your license is the TRAEFIKEE_LICENSE environment variable)
 vault kv put secret/traefikee/license license_key=$TRAEFIKEE_LICENSE
