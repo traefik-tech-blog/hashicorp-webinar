@@ -2,12 +2,6 @@ job "countdash" {
   datacenters = ["dc1"]
 
   group "api" {
-    affinity {
-      attribute = "${node.unique.name}"
-      value     = "traefik-webinar-2"
-      weight    = 100
-    }
-
     network {
       mode = "bridge"
     }
@@ -27,21 +21,20 @@ job "countdash" {
       config {
         image = "hashicorpnomad/counter-api:v3"
       }
+
+      resources {
+        cpu    = 100
+        memory = 128
+      }
     }
   }
 
   group "dashboard" {
-    affinity {
-      attribute = "${node.unique.name}"
-      value     = "traefik-webinar-1"
-      weight    = 100
-    }
-
     network {
       mode = "bridge"
 
       port "http" {
-        to     = 9002
+        to = 9002
       }
     }
 
@@ -76,6 +69,11 @@ job "countdash" {
 
       config {
         image = "hashicorpnomad/counter-dashboard:v3"
+      }
+
+      resources {
+        cpu    = 100
+        memory = 128
       }
     }
   }
