@@ -13,6 +13,10 @@ client {
   enabled           = true
   network_interface = "eth1"
 
+  meta {        # OPTIONAL -- this is envoy with curl
+    "connect.sidecar_image" = "assareh/envoy:v1.18.3"
+  }
+
   host_volume "traefikee-data" {
     path      = "/opt/traefikee"
     read_only = false
