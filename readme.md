@@ -82,14 +82,6 @@ Visit http://localhost:8080/whoami from your desktop. Take note of the value `Re
 #### Consul Connect
 
 ```bash
-nomad run jobs/countdash.nomad
-```
-
-Visit http://countdash.localhost:8080/ from your desktop. You should see a dashboard showing Connected and displaying an incrementing counter.
-
-*Note*: You'll need to add `countdash.localhost` to the `127.0.0.1` entry in your `/etc/hosts` file in order to properly resolve the app from your browser.
-
-```bash
 nomad run jobs/whoami-connect.nomad
 
 nomad status
@@ -97,7 +89,23 @@ nomad status
 curl localhost/whoami
 ```
 
-Visit http://localhost:8080/whoami from your desktop. Take note of the value `RemoteAddr`. What is it now? What was it before? What's changed and why?
+Visit http://localhost:8080/whoami from your desktop. What happens?
+
+```bash
+consul intention match whoami
+
+consul intention create traefik whoami
+
+curl localhost/whoami
+```
+
+Now try again. Take note of the value `RemoteAddr`. What is it now? What was it before? What's changed and why?
+
+Use the following command to view the certificate, replacing the port with the mapped port of the proxy sidecar.
+
+```bash
+nomad alloc exec -task connect-proxy-whoami -job whoami curl -kv https://localhost:23628
+```
 
 *Note*: Traefik Connect integration requires the parameter `connectAware` be set to `true` in the consulCatalog provider section of your Traefik configuration.
 
@@ -121,7 +129,7 @@ Next we will transfer the bundle.zip to the primary vagrant host. To accomplish 
 vagrant scp bundle.zip /home/vagrant/bundle.zip
 ```
 
-Alternatively, you can uncomment [line 105](https://github.com/traefik-tech-blog/hashicorp-webinar/blob/master/Vagrantfile#L105) in the Vagrantfile and then run `vagrant reload --provision`. The Vagrant reload will take several minutes.
+Alternatively, you can uncomment [line 112](https://github.com/traefik-tech-blog/hashicorp-webinar/blob/master/Vagrantfile#L112) in the Vagrantfile and then run `vagrant reload --provision`. The Vagrant reload will take several minutes.
 
 Use the `vagrant ssh` command to start a shell session on it.
 
@@ -147,20 +155,21 @@ vault kv put secret/traefikee/plugin token=$(openssl rand -base64 10)
 # run traefikee nomad job
 nomad job run jobs/traefikee.nomad
 
-# get controller alloc ID
-nomad status traefikee
-
-# update with actual ALLOC_ID value
-export CONTROLLER_ALLOC_ID=$ALLOC_ID
-
 # get proxy join token
-nomad alloc exec -i -t -task controllers $CONTROLLER_ALLOC_ID /traefikee tokens --socket local/cluster.sock
+nomad alloc exec -task controllers -job traefikee /traefikee tokens --socket local/cluster.sock
 # export provided TRAEFIKEE_PROXY_TOKEN
 
 # add proxy token to vault
 vault kv put secret/traefikee/proxy token=$TRAEFIKEE_PROXY_TOKEN
+```
 
-# verify all nodes are running (outside of VM)
+On your host (outside of Vagrant), let's verify the TraefikEE cluster with teectl.
+
+```bash
+# switch contexts
+teectl cluster use --name nomad
+
+# verify all nodes are running
 teectl get nodes
 ```
 
@@ -171,7 +180,7 @@ teectl get nodes
 vault secrets enable pki
 
 vault write pki/root/generate/internal common_name="VAULT PKI CERT"
-vault write pki/roles/traefikee allowed_domains=localhost allow_bare_domains=true allow_subdomains=true max_ttl=10h
+vault write pki/roles/traefikee allowed_domains=localhost allow_bare_domains=true allow_subdomains=false max_ttl=10h
 
 # apply static and dynamic config (outside of VM)
 teectl apply --file traefikee/static.yaml
@@ -188,7 +197,7 @@ curl -kv https://localhost/whoami-pki
 
 ```bash
 # generate self-signed certificate
-openssl req -x509 -newkey rsa:2048 -keyout localhost.key.pem -out localhost.cert.pem -nodes -subj '/CN=localhost'
+openssl req -x509 -newkey rsa:2048 -keyout localhost.key.pem -out localhost.cert.pem -nodes -subj '/CN=tls.localhost'
 
 # Add TLS cert to Vault KV store
 vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key="$(cat localhost.key.pem | base64 -w0)"
@@ -197,15 +206,14 @@ vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key=
 nomad run jobs/whoami-tls.nomad
 
 # curl and note TLS certificate
-curl -kv https://localhost/whoami-tls
+curl -kv https://tls.localhost/
 ```
 
 ## Cleaning up
 
 ### Halt the VMs
 
-Exit any shell sessions that you made to the virtual machine. Use the `vagrant halt` command to stop the
-running VMs.
+Stop running jobs and exit any shell sessions that you made to the virtual machine. Use the `vagrant halt` command to stop the running VMs.
 
 ```shell-session
 $ vagrant halt
@@ -260,3 +268,4 @@ the Vagrantfile.
 - [Introduction to Consul](https://learn.hashicorp.com/tutorials/consul/get-started?in=consul/getting-started)
 - [Introduction to Vault](https://learn.hashicorp.com/tutorials/vault/getting-started-intro?in=vault/getting-started)
 - [Introduction to Nomad](https://learn.hashicorp.com/tutorials/nomad/get-started-intro?in=nomad/get-started)
+- [Using Traefik on Nomad](https://atodorov.me/2021/03/27/using-traefik-on-nomad/)

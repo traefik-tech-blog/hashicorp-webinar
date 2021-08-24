@@ -90,6 +90,11 @@ touch /var/log/vault_audit.log
 vault audit enable file file_path=/var/log/vault_audit.log
 VAULT
 
+$consul = <<CONSUL
+echo "Creating an intention..."
+consul intention create -deny traefik '*'
+CONSUL
+
 Vagrant.configure("2") do |config|
   # Start from this base box
   config.vm.box = "hashicorp/bionic64"
@@ -141,5 +146,8 @@ Vagrant.configure("2") do |config|
     # Expose the traefik service ports to the host
     secondary.vm.network "forwarded_port", guest: 80, host: 8081, auto_correct: true, host_ip: "127.0.0.1"
     secondary.vm.network "forwarded_port", guest: 443, host: 8444, auto_correct: true, host_ip: "127.0.0.1"
+
+    # set up Consul
+    secondary.vm.provision "shell", inline: $consul
   end
 end
