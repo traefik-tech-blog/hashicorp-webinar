@@ -129,7 +129,7 @@ Next we will transfer the bundle.zip to the primary vagrant host. To accomplish 
 vagrant scp bundle.zip /home/vagrant/bundle.zip
 ```
 
-Alternatively, you can uncomment [line 105](https://github.com/traefik-tech-blog/hashicorp-webinar/blob/master/Vagrantfile#L105) in the Vagrantfile and then run `vagrant reload --provision`. The Vagrant reload will take several minutes.
+Alternatively, you can uncomment [line 112](https://github.com/traefik-tech-blog/hashicorp-webinar/blob/master/Vagrantfile#L112) in the Vagrantfile and then run `vagrant reload --provision`. The Vagrant reload will take several minutes.
 
 Use the `vagrant ssh` command to start a shell session on it.
 
