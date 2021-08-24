@@ -161,8 +161,15 @@ nomad alloc exec -task controllers -job traefikee /traefikee tokens --socket loc
 
 # add proxy token to vault
 vault kv put secret/traefikee/proxy token=$TRAEFIKEE_PROXY_TOKEN
+```
 
-# verify all nodes are running (outside of VM)
+On your host (outside of Vagrant), let's verify the TraefikEE cluster with teectl.
+
+```bash
+# switch contexts
+teectl cluster use --name nomad
+
+# verify all nodes are running
 teectl get nodes
 ```
 
@@ -173,7 +180,7 @@ teectl get nodes
 vault secrets enable pki
 
 vault write pki/root/generate/internal common_name="VAULT PKI CERT"
-vault write pki/roles/traefikee allowed_domains=localhost allow_bare_domains=true allow_subdomains=true max_ttl=10h
+vault write pki/roles/traefikee allowed_domains=localhost allow_bare_domains=true allow_subdomains=false max_ttl=10h
 
 # apply static and dynamic config (outside of VM)
 teectl apply --file traefikee/static.yaml
@@ -190,7 +197,7 @@ curl -kv https://localhost/whoami-pki
 
 ```bash
 # generate self-signed certificate
-openssl req -x509 -newkey rsa:2048 -keyout localhost.key.pem -out localhost.cert.pem -nodes -subj '/CN=localhost'
+openssl req -x509 -newkey rsa:2048 -keyout localhost.key.pem -out localhost.cert.pem -nodes -subj '/CN=tls.localhost'
 
 # Add TLS cert to Vault KV store
 vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key="$(cat localhost.key.pem | base64 -w0)"
@@ -199,7 +206,7 @@ vault kv put secret/localhost cert="$(cat localhost.cert.pem | base64 -w0)" key=
 nomad run jobs/whoami-tls.nomad
 
 # curl and note TLS certificate
-curl -kv https://localhost/whoami-tls
+curl -kv https://tls.localhost/
 ```
 
 ## Cleaning up
