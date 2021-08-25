@@ -269,3 +269,4 @@ the Vagrantfile.
 - [Introduction to Vault](https://learn.hashicorp.com/tutorials/vault/getting-started-intro?in=vault/getting-started)
 - [Introduction to Nomad](https://learn.hashicorp.com/tutorials/nomad/get-started-intro?in=nomad/get-started)
 - [Using Traefik on Nomad](https://atodorov.me/2021/03/27/using-traefik-on-nomad/)
+- [Integrating Consul Connect Service Mesh with Traefik 2.5](https://traefik.io/blog/integrating-consul-connect-service-mesh-with-traefik-2-5/)
